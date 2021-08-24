@@ -27,7 +27,6 @@ public struct PhotoPreview: View {
         self._resultPhotoData = resultPhotoData
     }
     
-    
     var uiImage: UIImage? {
         guard let data = photoData else { return nil }
         let photo = Photo(data: data)
@@ -64,7 +63,6 @@ public struct PhotoPreview: View {
         }
     }
 }
-
 
 struct PhotoPreview_Previews: PreviewProvider {
     @StateObject static var model = PreviewModel()

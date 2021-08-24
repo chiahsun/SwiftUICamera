@@ -26,6 +26,13 @@ struct PhotoPreview_Previews: PreviewProvider {
     @State static var resultPhotoData: Data?
     static var previews: some View {
         PhotoPreview(photoData: nil, model: model, resultPhotoData: $resultPhotoData)
+    }
+}
+
+struct CaptureAndPreview_Previews: PreviewProvider {
+    @State static var resultPhotoData: Data?
+    static var previews: some View {
+        CaptureAndPreview(resultPhotoData: $resultPhotoData)
         // Text("Hello")
     }
 }
