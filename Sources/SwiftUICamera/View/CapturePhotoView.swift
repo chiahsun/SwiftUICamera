@@ -1,7 +1,7 @@
 import SwiftUI
 import Combine
 
-struct CapturePhotoView: View {
+public struct CapturePhotoView: View {
     @StateObject var model = CameraModel()
     @State var cancellables: Set<AnyCancellable> = []
     @State var hideButton = false
@@ -9,7 +9,7 @@ struct CapturePhotoView: View {
     @State var captureStage: PhotoCaptureStage = .willBeginCapture
     @Binding var toPhotoPreviewPhotoData: Data?
     
-    var body: some View {
+    public var body: some View {
         ZStack {
             CameraPreview(session: model.session)
             .onAppear {
