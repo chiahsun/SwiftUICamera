@@ -34,7 +34,7 @@ struct CameraPreview: UIViewRepresentable {
 }
 
 struct CameraPreview_Previews: PreviewProvider {
-    @available(iOS 13.0.0, *)
+    @available(iOS 13.0, *)
     static var previews: some View {
         CameraPreview(session: AVCaptureSession())
     }

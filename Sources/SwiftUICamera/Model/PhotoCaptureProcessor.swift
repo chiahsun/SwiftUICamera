@@ -32,7 +32,7 @@ class PhotoCaptureProcessor: NSObject, AVCapturePhotoCaptureDelegate, Observable
     @Published var photoData: Data?
 
     private let debug = false
-    
+
     override init() {
         if debug {
             print("Init a PhotoCaptureProcessor")

@@ -11,7 +11,7 @@ final class CameraModel: ObservableObject {
     @Published var permissionGranted = false
     // Take photo after isSessionRunning turns true
     @Published var isSessionRunning = false
-    
+
     @Published var configureSessionStatus: ConfigureSessionStatus = .unknown
 
     @objc dynamic var videoDeviceInput: AVCaptureDeviceInput!
@@ -109,7 +109,7 @@ final class CameraModel: ObservableObject {
         }
     }
     
-    
+
     private func capturePhotoInner(_ photoCaptureProcessor: PhotoCaptureProcessor) {
         if let photoOutputConnection = self.photoOutput.connection(with: .video) {
             // TODO
@@ -152,7 +152,7 @@ final class CameraModel: ObservableObject {
         }
         self.photoOutput.capturePhoto(with: photoSettings, delegate: photoCaptureProcessor)
     }
-    
+
     // Publishing changes from background threads is not allowed; make sure to publish values from the main thread
     private func updateConfigureSessionStatus(_ status: ConfigureSessionStatus) {
         DispatchQueue.main.async {

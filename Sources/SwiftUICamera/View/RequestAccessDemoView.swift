@@ -1,9 +1,9 @@
 import SwiftUI
 
 @available(iOS 13, *)
-public struct RequestAccessView: View {
+public struct RequestAccessDemoView: View {
     @StateObject var model = CameraModel()
-    
+
     // This flag is used to disable requesting access when preview since we cannot and camera permission in a Swift pacakge
     var previewMode = false
     public init(previewMode: Bool = false) {
@@ -30,8 +30,8 @@ public struct RequestAccessView: View {
 }
 
 struct RequestAccessView_Previews: PreviewProvider {
-    @available(iOS 13.0.0, *)
+    @available(iOS 13.0, *)
     static var previews: some View {
-        RequestAccessView(previewMode: true)
+        RequestAccessDemoView(previewMode: true)
     }
 }
