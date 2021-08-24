@@ -7,6 +7,7 @@ public struct ConfigureSessionDemoView: View {
     @State var cancellable: Cancellable?
 
     var previewMode = false
+    
     public init(previewMode: Bool = false) {
         self.previewMode = previewMode
     }

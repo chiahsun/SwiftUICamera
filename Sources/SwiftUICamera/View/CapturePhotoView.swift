@@ -9,6 +9,10 @@ public struct CapturePhotoView: View {
     @State var captureStage: PhotoCaptureStage = .willBeginCapture
     @Binding var toPhotoPreviewPhotoData: Data?
     
+    public init(toPhotoPreviewPhotoData: Binding<Data?>) {
+        self._toPhotoPreviewPhotoData = toPhotoPreviewPhotoData
+    }
+    
     public var body: some View {
         ZStack {
             CameraPreview(session: model.session)
