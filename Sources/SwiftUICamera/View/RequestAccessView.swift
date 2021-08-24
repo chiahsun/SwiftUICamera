@@ -4,6 +4,8 @@ import SwiftUI
 public struct RequestAccessView: View {
     @StateObject var model = CameraModel()
 
+    public init() {}
+
     public var body: some View {
         ZStack {
             CameraPreview(session: model.session)
