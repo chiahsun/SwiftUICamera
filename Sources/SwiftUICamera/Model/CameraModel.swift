@@ -19,11 +19,15 @@ final class CameraModel: ObservableObject {
     let session = AVCaptureSession()
     private let sessionQueue = DispatchQueue(label: "session")
     
+    private var cameraFeedManager: AVCaptureVideoDataOutputSampleBufferDelegate?
+
     private var keyValueObservations = [NSKeyValueObservation]()
     
     private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
     private var photoOutput = AVCapturePhotoOutput()
-    
+
+    private var videoDataOutput = AVCaptureVideoDataOutput()
+
     func requestAccess() {
         // https://developer.apple.com/documentation/avfoundation/avcapturedevice/1624613-authorizationstatus
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -71,24 +75,10 @@ final class CameraModel: ObservableObject {
         // simultaneous use of the rear and front cameras.
         // self.session.removeInput(self.videoDeviceInput)
         
-        // https://developer.apple.com/documentation/avfoundation/cameras_and_media_capture/capturing_still_and_live_photos
-        guard session.canAddInput(videoDeviceInput) else {
-            print("Fail to configure session")
-            updateConfigureSessionStatus(.failure)
-            return
-        }
-        session.addInput(videoDeviceInput)
-        self.videoDeviceInput = videoDeviceInput
-     
-        let photoOutput = AVCapturePhotoOutput()
-        photoOutput.isHighResolutionCaptureEnabled = true
-
-        guard session.canAddOutput(photoOutput) else { return }
+        guard addVideoInput(videoDeviceInput: videoDeviceInput) else { return }
+        guard addVideoOutput() else { return }
+        guard addPhotoOutput() else { return }
         
-        self.photoOutput = photoOutput
-        session.sessionPreset = .photo
-        session.addOutput(photoOutput)
-      
         // https://developer.apple.com/documentation/avfoundation/avcapturesession/1388133-isrunning
         // You can observe the value of this property using Key-value observing.
         let isRunningObservation = session.observe(\.isRunning, options: .new) { _, change in
@@ -102,6 +92,53 @@ final class CameraModel: ObservableObject {
         updateConfigureSessionStatus(.success)
     }
     
+    private func addVideoInput(videoDeviceInput: AVCaptureDeviceInput!) -> Bool {
+        // https://developer.apple.com/documentation/avfoundation/cameras_and_media_capture/capturing_still_and_live_photos
+        guard session.canAddInput(videoDeviceInput) else {
+            print("Fail to configure session")
+            updateConfigureSessionStatus(.failure)
+            return false
+        }
+        session.addInput(videoDeviceInput)
+        self.videoDeviceInput = videoDeviceInput
+        return true
+    }
+    
+    private func addVideoOutput() -> Bool {
+        if cameraFeedManager == nil {
+            // This means we don't need to do anything, let it continue next steps
+            return true
+        }
+
+        let bufferQueue = DispatchQueue(label: "bufferQueue")
+        videoDataOutput.setSampleBufferDelegate(cameraFeedManager, queue:  bufferQueue)
+        videoDataOutput.alwaysDiscardsLateVideoFrames = true
+        // TODO: check format
+        videoDataOutput.videoSettings = [String(kCVPixelBufferPixelFormatTypeKey): kCMPixelFormat_32BGRA]
+
+        guard session.canAddOutput(videoDataOutput) else { return false }
+
+        session.addOutput(videoDataOutput)
+        videoDataOutput.connection(with: .video)?.videoOrientation = .portrait
+        return true
+    }
+
+    private func addPhotoOutput() -> Bool {
+        let photoOutput = AVCapturePhotoOutput()
+        photoOutput.isHighResolutionCaptureEnabled = true
+
+        guard session.canAddOutput(photoOutput) else { return false }
+        
+        self.photoOutput = photoOutput
+        session.sessionPreset = .photo
+        session.addOutput(photoOutput)
+        return true
+    }
+    
+    func setCameraFeed(cameraFeed: AVCaptureVideoDataOutputSampleBufferDelegate) {
+        self.cameraFeedManager = cameraFeed
+    }
+
     // See: https://developer.apple.com/documentation/avfoundation/cameras_and_media_capture/avcam_building_a_camera_app#//apple_ref/doc/uid/DTS40010112 Capture a Photo
     func capturePhoto(_ photoCaptureProcessor: PhotoCaptureProcessor) {
         sessionQueue.async {

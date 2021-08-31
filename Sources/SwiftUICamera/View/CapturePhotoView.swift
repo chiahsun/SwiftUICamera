@@ -20,7 +20,6 @@ public struct CapturePhotoView: View {
                 print("CameraPreview onAppear")
                 print("binding: \($toPhotoPreviewPhotoData)")
                 model.requestAccess()
-                
                 model.$permissionGranted.sink { receiveValue in
                     if receiveValue {
                         model.startSession()
@@ -34,7 +33,6 @@ public struct CapturePhotoView: View {
             VStack {
                 Text(String("\(captureStage)"))
                 Text(String(numPhotoTaken))
-                    
                 Spacer()
             }
             .padding()

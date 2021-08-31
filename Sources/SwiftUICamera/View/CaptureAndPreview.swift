@@ -7,7 +7,7 @@ public struct CaptureAndPreview: View {
     @State var cancellables: Set<AnyCancellable> = []
 
     @Binding var resultPhotoData: Data?
-    
+
     public init(resultPhotoData: Binding<Data?>) {
         self._resultPhotoData = resultPhotoData
     }
