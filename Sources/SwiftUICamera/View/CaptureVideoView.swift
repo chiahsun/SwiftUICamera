@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 public class CaptureVideoModel: ObservableObject {
-    @Published var pixelBuffer: CVPixelBuffer?
+    @Published public var pixelBuffer: CVPixelBuffer?
 }
 
 public struct CaptureVideoView: View {
