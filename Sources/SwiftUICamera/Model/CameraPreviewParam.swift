@@ -9,13 +9,13 @@ public struct CameraPreviewParam {
 }
 
 extension CameraPreviewParam {
-    public static func makeParam() -> CameraPreviewParam {
+    public static func makeParam(color: UIColor = .black, preset: AVCaptureSession.Preset = .high, gravity: AVLayerVideoGravity = .resizeAspectFill) -> CameraPreviewParam {
         return CameraPreviewParam(
-            color: .black,
-            preset: .high,
+            color: color,
+            preset: preset,
             // 1. https://stackoverflow.com/questions/42609861/how-can-i-set-the-correct-camera-image-size-on-a-preview-layer
             // 2. See tensorflow lite iOS demo on object detection
-            gravity: .resizeAspectFill
+            gravity: gravity
         )
     }
 }
