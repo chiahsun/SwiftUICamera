@@ -26,6 +26,10 @@ struct CameraPreview: UIViewRepresentable {
         let view = PreviewView()
         view.backgroundColor = .black
         view.videoPreviewLayer.session = session
+        // 1. https://stackoverflow.com/questions/42609861/how-can-i-set-the-correct-camera-image-size-on-a-preview-layer
+        // 2. See tensorflow lite iOS demo on object detection
+        view.videoPreviewLayer.videoGravity = .resizeAspectFill
+
         return view
     }
     

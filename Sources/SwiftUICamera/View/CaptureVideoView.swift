@@ -52,6 +52,14 @@ public struct CaptureVideoView: View {
             .onDisappear {
                 print("CameraPreview onDisappear")
             }
+            // Debug use            
+            /*GeometryReader { metrics in
+                Rectangle().position(x: metrics.size.width/2, y: metrics.size.height/2)
+                    .frame(width: metrics.size.width, height: metrics.size.height)
+                     .foregroundColor(Color.red.opacity(0.4))
+                     .border(Color.red.opacity(0.8), width: 4)
+
+            }*/
             if (enableSampleVideoView) {
                 sampleVideoView
             }
