@@ -1,18 +1,22 @@
 import SwiftUI
+import AVFoundation
 
 @available(iOS 13, *)
 public struct RequestAccessDemoView: View {
     @StateObject var model = CameraModel()
 
+    let cameraPreviewParam: CameraPreviewParam
+
     // This flag is used to disable requesting access when preview since we cannot and camera permission in a Swift pacakge
     var previewMode = false
-    public init(previewMode: Bool = false) {
+    public init(previewMode: Bool = false, cameraPreviewParam: CameraPreviewParam = CameraPreviewParam.makeParam()) {
         self.previewMode = previewMode
+        self.cameraPreviewParam = cameraPreviewParam
     }
 
     public var body: some View {
         ZStack {
-            CameraPreview(session: model.session)
+            CameraPreview(session: model.session, param: self.cameraPreviewParam)
             // https://developer.apple.com/documentation/swiftui/view/onappear(perform:)
             .onAppear {
                 if (!previewMode) {

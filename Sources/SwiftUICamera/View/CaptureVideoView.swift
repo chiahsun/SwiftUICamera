@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import AVFoundation
 
 public class CaptureVideoModel: ObservableObject {
     @Published public var pixelBuffer: CVPixelBuffer?
@@ -11,9 +12,12 @@ public struct CaptureVideoView: View {
     @State var videoImage: UIImage?
     @ObservedObject public var model = CaptureVideoModel()
     
+    let cameraPreviewParam: CameraPreviewParam
+
     var enableSampleVideoView = false
-    public init(enableSampleVideoView: Bool = false) {
+    public init(enableSampleVideoView: Bool = false, cameraPreviewParam: CameraPreviewParam = CameraPreviewParam.makeParam()) {
         self.enableSampleVideoView = enableSampleVideoView
+        self.cameraPreviewParam = cameraPreviewParam
     }
     
     var sampleVideoView: AnyView {
@@ -27,7 +31,7 @@ public struct CaptureVideoView: View {
 
     public var body: some View {
         ZStack {
-            CameraPreview(session: cameraModel.session)
+            CameraPreview(session: cameraModel.session, param: self.cameraPreviewParam)
             .onAppear {
                 print("CameraPreview onAppear")
                 cameraModel.requestAccess()

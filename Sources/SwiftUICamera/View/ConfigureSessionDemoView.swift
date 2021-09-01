@@ -1,15 +1,18 @@
 import SwiftUI
 import Combine
+import AVFoundation
 
 @available(iOS 13, *)
 public struct ConfigureSessionDemoView: View {
     @StateObject var model = CameraModel()
     @State var cancellable: Cancellable?
 
+    let cameraPreviewParam: CameraPreviewParam
+
     var previewMode = false
-    
-    public init(previewMode: Bool = false) {
+    public init(previewMode: Bool = false, cameraPreviewParam: CameraPreviewParam = CameraPreviewParam.makeParam()) {
         self.previewMode = previewMode
+        self.cameraPreviewParam = cameraPreviewParam
     }
     
     var configurationSessionStatusString: String {
@@ -18,7 +21,7 @@ public struct ConfigureSessionDemoView: View {
     
     public var body: some View {
         ZStack {
-            CameraPreview(session: model.session)
+            CameraPreview(session: model.session, param: self.cameraPreviewParam)
             .onAppear {
                 if (!previewMode) {
                     model.requestAccess()

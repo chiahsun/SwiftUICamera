@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import AVFoundation
 
 public struct CapturePhotoView: View {
     @StateObject var model = CameraModel()
@@ -8,14 +9,17 @@ public struct CapturePhotoView: View {
     @State var numPhotoTaken = 0
     @State var captureStage: PhotoCaptureStage = .willBeginCapture
     @Binding var toPhotoPreviewPhotoData: Data?
-    
-    public init(toPhotoPreviewPhotoData: Binding<Data?>) {
+
+    let cameraPreviewParam: CameraPreviewParam
+
+    public init(toPhotoPreviewPhotoData: Binding<Data?>, cameraPreviewParam: CameraPreviewParam = CameraPreviewParam.makeParam()) {
         self._toPhotoPreviewPhotoData = toPhotoPreviewPhotoData
+        self.cameraPreviewParam = cameraPreviewParam
     }
     
     public var body: some View {
         ZStack {
-            CameraPreview(session: model.session)
+            CameraPreview(session: model.session, param: self.cameraPreviewParam)
             .onAppear {
                 print("CameraPreview onAppear")
                 print("binding: \($toPhotoPreviewPhotoData)")
