@@ -15,6 +15,8 @@ final class CameraModel: ObservableObject {
     @Published var configureSessionStatus: ConfigureSessionStatus = .unknown
 
     @objc dynamic var videoDeviceInput: AVCaptureDeviceInput!
+    private var videoDeviceOutput: AVCaptureOutput?
+    private var photoDeviceOutput: AVCaptureOutput?
 
     let session = AVCaptureSession()
     private let sessionQueue = DispatchQueue(label: "session")
@@ -27,6 +29,8 @@ final class CameraModel: ObservableObject {
     private var photoOutput = AVCapturePhotoOutput()
 
     private var videoDataOutput = AVCaptureVideoDataOutput()
+
+    private let debug = false
 
     func requestAccess() {
         // https://developer.apple.com/documentation/avfoundation/avcapturedevice/1624613-authorizationstatus
@@ -54,37 +58,65 @@ final class CameraModel: ObservableObject {
             self.session.startRunning()
         }
     }
-    
+
+    func stopSession() {
+        if debug {
+            print("  > stopSession called ")
+        }
+
+        if isSessionRunning {
+            sessionQueue.async {
+                if self.debug {
+                    print("    > self.session.stopRunning()")
+                }
+                self.session.removeInput(self.videoDeviceInput)
+                if let videoOutput = self.videoDeviceOutput {
+                    self.session.removeOutput(videoOutput)
+                    self.videoDeviceOutput = nil
+                }
+                if let photoOutput = self.photoDeviceOutput {
+                    self.session.removeOutput(photoOutput)
+                    self.photoDeviceOutput  = nil
+                }
+
+                self.session.stopRunning()
+            }
+        }
+    }
+
     // https://developer.apple.com/documentation/avfoundation/cameras_and_media_capture/setting_up_a_capture_session
     private func configureSession() {
-        let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
-        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice!) else {
+        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+            print("Fail to get video device")
+            return
+        }
+        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else {
             updateConfigureSessionStatus(.failure)
             return
         }
-        
+
         // Call beginConfiguration() before changing a session’s inputs or outputs, and call commitConfiguration() after making changes.
         session.beginConfiguration()
         defer {
             session.commitConfiguration()
         }
-        
+
         // TODO: Only add this when changing camera
         // https://developer.apple.com/documentation/avfoundation/cameras_and_media_capture/avcam_building_a_camera_app#//apple_ref/doc/uid/DTS40010112
         // Remove the existing device input first, because AVCaptureSession doesn't support
         // simultaneous use of the rear and front cameras.
         // self.session.removeInput(self.videoDeviceInput)
-        
+
         guard addVideoInput(videoDeviceInput: videoDeviceInput) else { return }
         guard addVideoOutput() else { return }
         guard addPhotoOutput() else { return }
-        
+
         // https://developer.apple.com/documentation/avfoundation/avcapturesession/1388133-isrunning
         // You can observe the value of this property using Key-value observing.
         let isRunningObservation = session.observe(\.isRunning, options: .new) { _, change in
             DispatchQueue.main.async {
                 guard let newValue = change.newValue else { return }
-                
+
                 self.isSessionRunning = newValue
             }
         }
@@ -93,13 +125,18 @@ final class CameraModel: ObservableObject {
     }
     
     private func addVideoInput(videoDeviceInput: AVCaptureDeviceInput!) -> Bool {
+        if self.debug {
+            print("session.inputs: \(session.inputs) try add \(videoDeviceInput)")
+        }
         // https://developer.apple.com/documentation/avfoundation/cameras_and_media_capture/capturing_still_and_live_photos
         guard session.canAddInput(videoDeviceInput) else {
             print("Fail to configure session")
             updateConfigureSessionStatus(.failure)
             return false
         }
+
         session.addInput(videoDeviceInput)
+
         self.videoDeviceInput = videoDeviceInput
         return true
     }
@@ -119,6 +156,8 @@ final class CameraModel: ObservableObject {
         guard session.canAddOutput(videoDataOutput) else { return false }
 
         session.addOutput(videoDataOutput)
+        self.videoDeviceOutput = videoDataOutput
+
         videoDataOutput.connection(with: .video)?.videoOrientation = .portrait
         return true
     }
@@ -132,6 +171,8 @@ final class CameraModel: ObservableObject {
         self.photoOutput = photoOutput
         session.sessionPreset = .photo
         session.addOutput(photoOutput)
+        self.photoDeviceOutput = photoOutput
+
         return true
     }
     

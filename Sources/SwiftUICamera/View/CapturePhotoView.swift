@@ -32,6 +32,7 @@ public struct CapturePhotoView: View {
             }
             .onDisappear {
                 print("CameraPreview onDisappear")
+                model.stopSession()
             }
             
             VStack {

@@ -8,7 +8,7 @@ public struct CaptureVideoDemo: View {
     public init() { }
     
     var captureVideoView: some View {
-        let view = CaptureVideoView()
+        let view = CaptureVideoView(enableSampleVideoView: true)
         return view.onAppear(perform: {
             view.model.$pixelBuffer.sink(receiveValue: { _ in
                 count += 1
